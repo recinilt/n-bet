@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nöbet Oluşturma</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: 20px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #progress-container {
+            display: none;
+            margin-top: 20px;
+        }
+        #progress-bar {
+            width: 0;
+            height: 20px;
+            background-color: #4caf50;
+            border-radius: 10px;
+        }
+        #progress-text {
+            text-align: center;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Nöbet Oluşturma</h1>
+    <div id="step-0" class="form-group">
+        <label for="year-month">Hangi yılın hangi ayı için nöbet oluşturulacak?</label>
+        <input type="month" id="year-month">
+        <button onclick="goToStep(1)">İleri</button>
+    </div>
+    <div id="step-1" class="form-group" style="display: none;">
+        <label for="person-count">Kaç kişi nöbet tutacak?</label>
+        <input type="number" id="person-count" min="1">
+        <button onclick="generatePersonInputs()">İleri</button>
+    </div>
+    <div id="step-2" class="form-group" style="display: none;">
+        <form id="person-form">
+            <div id="person-inputs"></div>
+            <button type="button" onclick="generateShifts()">Nöbet Oluştur</button>
+        </form>
+    </div>
+    <div id="progress-container">
+        <div id="progress-bar"></div>
+        <div id="progress-text">Nöbet oluşturuluyor...</div>
+    </div>
+    <div id="schedule" style="display: none;">
+        <h2>Oluşturulan Nöbet Tablosu</h2>
+        <table id="schedule-table" border="1" style="width: 100%; text-align: center;">
+        </table>
+    </div>
+</div>
+<script>
+    function goToStep(step) {
+        document.querySelector(`#step-${step - 1}`).style.display = 'none';
+        document.querySelector(`#step-${step}`).style.display = 'block';
+    }
+
+    function generatePersonInputs() {
+        const count = document.querySelector('#person-count').value;
+        const personInputs = document.querySelector('#person-inputs');
+        personInputs.innerHTML = '';
+
+        for (let i = 0; i < count; i++) {
+            personInputs.innerHTML += `
+                <div class="form-group">
+                    <label>Kişi ${i + 1} Adı:</label>
+                    <input type="text" name="person-name-${i}" required>
+                    <label>Kaç Nöbet Tutacak:</label>
+                    <input type="number" name="shift-count-${i}" required>
+                    <label>Hangi Günler İstiyor (virgül ile):</label>
+                    <input type="text" name="preferred-days-${i}">
+                    <label>Hangi Günler İstemiyor (virgül ile):</label>
+                    <input type="text" name="unpreferred-days-${i}">
+                    <label>Kaç Kişilik Gruplar Halinde (opsiyonel):</label>
+                    <input type="number" name="group-size-${i}">
+                    <label>En Fazla Kaç Nöbet Üst Üste (opsiyonel):</label>
+                    <input type="number" name="max-consecutive-${i}">
+                </div>
+            `;
+        }
+
+        goToStep(2);
+    }
+
+    function generateShifts() {
+        const formData = new FormData(document.querySelector('#person-form'));
+        const yearMonth = document.querySelector('#year-month').value;
+        const [year, month] = yearMonth.split('-');
+        const daysInMonth = new Date(year, month, 0).getDate();
+        const schedule = Array.from({ length: daysInMonth }, () => []);
+        const progressContainer = document.querySelector('#progress-container');
+        const progressBar = document.querySelector('#progress-bar');
+        const progressText = document.querySelector('#progress-text');
+
+        progressContainer.style.display = 'block';
+        let progress = 0;
+
+        const interval = setInterval(() => {
+            progress += 10;
+            progressBar.style.width = `${progress}%`;
+
+            if (progress >= 100) {
+                clearInterval(interval);
+                progressText.textContent = 'Nöbet oluşturuldu!';
+                displaySchedule(schedule, daysInMonth);
+            }
+        }, 100);
+
+        // TODO: Burada nöbet oluşturma algoritması uygulanacak.
+        // Form verileri formData ile alınabilir ve nöbet algoritması ile doldurulabilir.
+    }
+
+    function displaySchedule(schedule, daysInMonth) {
+        const scheduleDiv = document.querySelector('#schedule');
+        const scheduleTable = document.querySelector('#schedule-table');
+        scheduleTable.innerHTML = '<tr><th>Gün</th><th>Nöbetçi(ler)</th></tr>';
+
+        for (let i = 0; i < daysInMonth; i++) {
+            scheduleTable.innerHTML += `<tr><td>${i + 1}</td><td>${schedule[i].join(', ') || 'Boş'}</td></tr>`;
+        }
+
+        scheduleDiv.style.display = 'block';
+    }
+</script>
+</body>
+</html>

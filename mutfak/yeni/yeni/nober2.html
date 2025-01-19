@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nöbet Oluşturma Sayfası</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .form-section {
+            margin-bottom: 20px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 10px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Nöbet Oluşturma Sayfası</h1>
+
+    <div class="form-section">
+        <label for="numPeople">Kaç kişi nöbet tutacak?</label>
+        <input type="number" id="numPeople" min="1" required>
+        <button onclick="generatePeopleForm()">Devam</button>
+    </div>
+
+    <form id="peopleForm" class="form-section" style="display:none;">
+        <div id="peopleInputs"></div>
+        <label for="monthYear">Hangi yılın hangi ayı için nöbet oluşturulacak? (YYYY-MM)</label>
+        <input type="month" id="monthYear" required>
+        <button type="button" onclick="generateSchedule()">Nöbet Oluştur</button>
+    </form>
+
+    <div id="scheduleOutput" class="form-section" style="display:none;">
+        <h2>Nöbet Programı</h2>
+        <table id="scheduleTable">
+            <thead>
+                <tr>
+                    <th>Tarih</th>
+                    <th>Nöbetçi</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <script>
+        function generatePeopleForm() {
+            const numPeople = document.getElementById("numPeople").value;
+            if (numPeople <= 0) {
+                alert("Lütfen geçerli bir kişi sayısı girin.");
+                return;
+            }
+
+            const form = document.getElementById("peopleForm");
+            const inputsDiv = document.getElementById("peopleInputs");
+            inputsDiv.innerHTML = "";
+
+            for (let i = 1; i <= numPeople; i++) {
+                inputsDiv.innerHTML += `
+                    <div>
+                        <h3>Kişi ${i}</h3>
+                        <label>Ad: <input type="text" name="name${i}" required></label><br>
+                        <label>Kaç nöbet tutacak? <input type="number" name="shifts${i}" min="1" required></label><br>
+                        <label>Hangi günler nöbet ister? (Virgül ile ayırın) <input type="text" name="preferDays${i}" required></label><br>
+                        <label>Hangi günler nöbet istemez? (Virgül ile ayırın) <input type="text" name="avoidDays${i}"></label><br>
+                        <label>Kaçar kaçar nöbet tutmak ister? <input type="number" name="groupSize${i}" min="1" required></label><br>
+                        <label>En fazla kaç nöbet üst üste tutabilir? <input type="number" name="maxConsecutive${i}" min="1" required></label><br>
+                    </div>
+                `;
+            }
+
+            form.style.display = "block";
+        }
+
+        function generateSchedule() {
+            console.log("başladı")
+            const formData = new FormData(document.getElementById("peopleForm"));
+            const numPeople = document.getElementById("numPeople").value;
+            const monthYear = document.getElementById("monthYear").value;
+
+            if (!monthYear) {
+                alert("Lütfen bir yıl ve ay seçin.");
+                return;
+            }
+
+            const [year, month] = monthYear.split("-");
+            const daysInMonth = new Date(year, month, 0).getDate();
+            const schedule = [];
+
+            const people = [];
+            for (let i = 1; i <= numPeople; i++) {
+                people.push({
+                    name: formData.get(`name${i}`),
+                    shifts: parseInt(formData.get(`shifts${i}`)),
+                    preferDays: formData.get(`preferDays${i}`).split(",").map(day => parseInt(day.trim())),
+                    avoidDays: formData.get(`avoidDays${i}`)?.split(",").map(day => parseInt(day.trim())) || [],
+                    groupSize: parseInt(formData.get(`groupSize${i}`)),
+                    maxConsecutive: parseInt(formData.get(`maxConsecutive${i}`)),
+                });
+            }
+
+            let day = 1;
+            while (schedule.length < daysInMonth) {
+                for (const person of people) {
+                    if (person.shifts > 0 && !person.avoidDays.includes(day)) {
+                        if (person.preferDays.includes(day) || person.preferDays.length === 0) {
+                            schedule.push({ date: `${year}-${month.padStart(2, "0")}-${day.toString().padStart(2, "0")}`, person: person.name });
+                            person.shifts--;
+                            day += person.groupSize;
+                            if (day > daysInMonth) break;
+                        }
+                    }
+                }
+                if (day > daysInMonth) break;
+            }
+
+            const scheduleTable = document.getElementById("scheduleTable").querySelector("tbody");
+            scheduleTable.innerHTML = "";
+
+            schedule.forEach(entry => {
+                scheduleTable.innerHTML += `
+                    <tr>
+                        <td>${entry.date}</td>
+                        <td>${entry.person}</td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById("scheduleOutput").style.display = "block";
+        }
+    </script>
+</body>
+</html>

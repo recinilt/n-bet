@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Kayıt/Giriş</title>
+</head>
+<body>
+    <h1>Kayıt/Giriş</h1>
+
+    <div id="form-container">
+        <button id="kayit-btn">Kayıt Ol</button>
+        <button id="giris-btn">Giriş Yap</button>
+        <div id="sifremi-unuttum-container" style="display: none;">
+          <button id="sifremi-unuttum-btn">Şifremi Unuttum</button>
+        </div>
+
+        <div id="kayit-form" style="display: none;">
+            <input type="email" id="kayit-eposta" placeholder="E-posta"><br>
+            <input type="password" id="kayit-sifre" placeholder="Şifre"><br>
+            <input type="password" id="kayit-sifre-tekrar" placeholder="Şifre Tekrar"><br>
+            <button id="kayit-onayla-btn">Kaydı Onayla</button>
+        </div>
+
+        <div id="giris-form" style="display: none;">
+            <input type="email" id="giris-eposta" placeholder="E-posta"><br>
+            <input type="password" id="giris-sifre" placeholder="Şifre"><br>
+            <button id="giris-onayla-btn">Girişi Onayla</button>
+        </div>
+
+        <div id="hosgeldin-mesaji" style="display: none;">
+          <h2>Hoşgeldin!</h2>
+          <p id="kullanici-bilgileri"></p>
+          <button id="cikis-btn">Çıkış</button>
+        </div>
+    </div>
+
+    <script>
+      const kayitBtn = document.getElementById('kayit-btn');
+const girisBtn = document.getElementById('giris-btn');
+const sifremiUnuttumBtn = document.getElementById('sifremi-unuttum-btn');
+const sifremiUnuttumContainer = document.getElementById('sifremi-unuttum-container');
+const kayitForm = document.getElementById('kayit-form');
+const girisForm = document.getElementById('giris-form');
+const kayitEposta = document.getElementById('kayit-eposta');
+const kayitSifre = document.getElementById('kayit-sifre');
+const kayitSifreTekrar = document.getElementById('kayit-sifre-tekrar');
+const kayitOnaylaBtn = document.getElementById('kayit-onayla-btn');
+const girisEposta = document.getElementById('giris-eposta');
+const girisSifre = document.getElementById('giris-sifre');
+const girisOnaylaBtn = document.getElementById('giris-onayla-btn');
+const hosgeldinMesaji = document.getElementById('hosgeldin-mesaji');
+const kullaniciBilgileri = document.getElementById('kullanici-bilgileri');
+const cikisBtn = document.getElementById('cikis-btn');
+const formContainer = document.getElementById('form-container');
+
+kayitBtn.addEventListener('click', () => {
+    kayitForm.style.display = 'block';
+    girisForm.style.display = 'none';
+    sifremiUnuttumContainer.style.display = 'none';
+});
+
+girisBtn.addEventListener('click', () => {
+    girisForm.style.display = 'block';
+    kayitForm.style.display = 'none';
+    sifremiUnuttumContainer.style.display = 'block';
+});
+
+sifremiUnuttumBtn.addEventListener('click', () => {
+    const onay = confirm("Veriler sıfırlanarak yeni kayıt oluşturacaksınız, onaylıyor musunuz?");
+    if (onay) {
+      window.localStorage.removeItem('girildi');
+      //githubdaki dosyanın silinmesi için netlify fonksiyonuna istek atılmalı
+      const email = document.getElementById("giris-eposta").value;
+      fetch('/.netlify/functions/mynetlifygemini', {
+        method: 'POST',
+        body: JSON.stringify({ action: "sifremiunuttum", email: email }),
+      })
+      .then(response => response.json())
+      .then(data => {
+        if(data.message == "Dosya başarıyla silindi"){
+          alert("Şifreniz sıfırlandı. Yeni kayıt oluşturabilirsiniz.");
+          location.reload();
+        }else{
+          alert("Bir hata oluştu.");
+        }
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+        alert("Bir hata oluştu.");
+      });
+    }
+});
+
+
+kayitOnaylaBtn.addEventListener('click', async () => {
+    const email = kayitEposta.value;
+    const password = kayitSifre.value;
+    const passwordRepeat = kayitSifreTekrar.value;
+
+    if (password !== passwordRepeat) {
+        alert("Şifreler uyuşmuyor.");
+        return;
+    }
+
+    fetch('/.netlify/functions/mynetlifygemini', {
+        method: 'POST',
+        body: JSON.stringify({ action: "kayit", email, password }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (response.ok) {
+            alert(data.message);
+            kayitForm.style.display = 'none';
+            girisForm.style.display = 'block';
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+        alert("Bir hata oluştu.");
+    });
+});
+
+girisOnaylaBtn.addEventListener('click', async () => {
+    const email = girisEposta.value;
+    const password = girisSifre.value;
+
+    fetch('/.netlify/functions/mynetlifygemini', {
+        method: 'POST',
+        body: JSON.stringify({ action: "giris", email, password }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (response.ok) {
+            window.localStorage.setItem('girildi', 'true');
+            hosgeldinMesaji.style.display = 'block';
+            formContainer.style.display = 'none';
+            kullaniciBilgileri.textContent = `E-posta: ${data.data.email}, Şifre: ${data.data.password}`;
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+        alert("Bir hata oluştu.");
+    });
+});
+
+cikisBtn.addEventListener('click', () => {
+    window.localStorage.removeItem('girildi');
+    hosgeldinMesaji.style.display = 'none';
+    formContainer.style.display = 'block';
+    location.reload();
+});
+
+if (window.localStorage.getItem('girildi')) {
+    hosgeldinMesaji.style.display = 'block';
+    formContainer.style.display = 'none';
+    //Buraya verileri getirme kodu eklenebilir (gerek yok, bilgiler zaten ekranda)
+}
+    </script>
+</body>
+</html>

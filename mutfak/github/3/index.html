@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Send Email and Password</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .container {
+      width: 100%;
+      max-width: 400px;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h3>Send Email and Password</h3>
+    <input type="email" id="email" placeholder="E-posta" required><br>
+    <input type="password" id="password" placeholder="Şifre" required><br>
+    <button class="button" id="submit">Gönder</button>
+    <div id="response" style="margin-top: 20px; color: green;"></div>
+  </div>
+
+  <script>
+    document.getElementById('submit').addEventListener('click', async () => {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      if (!email || !password) {
+        alert('Lütfen eposta ve şifre girin.');
+        return;
+      }
+
+      try {
+        const response = await fetch('https://githubdeneme.netlify.app/.netlify/functions/mynetlify', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const data = await response.json();
+        document.getElementById('response').textContent = data.message;
+
+        console.log(data.message);
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Bir hata oluştu.');
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nöbet Oluşturma</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: center;
+        }
+        .hidden {
+            display: none;
+        }
+        .progress-bar {
+            width: 100%;
+            background-color: #f3f3f3;
+            border: 1px solid #ccc;
+            margin-top: 20px;
+        }
+        .progress-bar-fill {
+            height: 20px;
+            background-color: #4caf50;
+            width: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Nöbet Oluşturma</h1>
+    <div id="step-0">
+        <label for="year">Yıl:</label>
+        <input type="number" id="year" min="2000" max="2100" required>
+        <label for="month">Ay:</label>
+        <select id="month">
+            <option value="1">Ocak</option>
+            <option value="2">Şubat</option>
+            <option value="3">Mart</option>
+            <option value="4">Nisan</option>
+            <option value="5">Mayıs</option>
+            <option value="6">Haziran</option>
+            <option value="7">Temmuz</option>
+            <option value="8">Ağustos</option>
+            <option value="9">Eylül</option>
+            <option value="10">Ekim</option>
+            <option value="11">Kasım</option>
+            <option value="12">Aralık</option>
+        </select>
+        <button onclick="goToStep1()">Devam</button>
+    </div>
+
+    <div id="step-1" class="hidden">
+        <label for="personCount">Kaç kişi nöbet tutacak:</label>
+        <input type="number" id="personCount" min="1" required>
+        <button onclick="goToStep2()">Devam</button>
+    </div>
+
+    <div id="step-2" class="hidden">
+        <table id="personTable">
+            <thead>
+                <tr>
+                    <th>Ad</th>
+                    <th>İstemediği Günler</th>
+                    <th>İstediği Günler</th>
+                    <th>En Fazla Kaç Gün Üst Üste</th>
+                    <th>Kaçar Kaçar Tutmak İstiyor</th>
+                    <th>Toplam Nöbet Sayısı</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <button onclick="generateSchedule()">Nöbet Oluştur</button>
+    </div>
+
+    <div id="progress" class="hidden">
+        <div class="progress-bar">
+            <div id="progressBarFill" class="progress-bar-fill"></div>
+        </div>
+        <p id="progressText">Nöbet oluşturuluyor...</p>
+    </div>
+
+    <div id="result" class="hidden">
+        <h2>Oluşturulan Nöbet Listesi</h2>
+        <table id="scheduleTable">
+            <thead>
+                <tr>
+                    <th>Gün</th>
+                    <th>Nöbetçi(ler)</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function goToStep1() {
+            document.getElementById('step-0').classList.add('hidden');
+            document.getElementById('step-1').classList.remove('hidden');
+        }
+
+        function goToStep2() {
+            const personCount = parseInt(document.getElementById('personCount').value);
+            const tbody = document.getElementById('personTable').querySelector('tbody');
+            tbody.innerHTML = '';
+            for (let i = 0; i < personCount; i++) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><input type="text" required></td>
+                    <td><input type="text" placeholder="1,2,3"></td>
+                    <td><input type="text" placeholder="4,5,6"></td>
+                    <td><input type="number" min="1" placeholder="Opsiyonel"></td>
+                    <td><input type="number" min="1" placeholder="Opsiyonel"></td>
+                    <td><input type="number" min="1" required></td>
+                `;
+                tbody.appendChild(row);
+            }
+            document.getElementById('step-1').classList.add('hidden');
+            document.getElementById('step-2').classList.remove('hidden');
+        }
+
+        function generateSchedule() {
+            const year = parseInt(document.getElementById('year').value);
+            const month = parseInt(document.getElementById('month').value);
+            const daysInMonth = new Date(year, month, 0).getDate();
+            const people = [];
+            const rows = document.getElementById('personTable').querySelectorAll('tbody tr');
+
+            rows.forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                people.push({
+                    name: inputs[0].value,
+                    unwantedDays: inputs[1].value.split(',').map(Number).filter(Boolean),
+                    wantedDays: inputs[2].value.split(',').map(Number).filter(Boolean),
+                    maxConsecutive: parseInt(inputs[3].value) || Infinity,
+                    batchSize: parseInt(inputs[4].value) || 1,
+                    totalShifts: parseInt(inputs[5].value),
+                });
+            });
+
+            document.getElementById('step-2').classList.add('hidden');
+            document.getElementById('progress').classList.remove('hidden');
+
+            setTimeout(() => {
+                const schedule = [];
+
+                for (let day = 1; day <= daysInMonth; day++) {
+                    schedule.push({ day, people: [] });
+                }
+
+                // Fill wanted days first
+                people.forEach(person => {
+                    person.wantedDays.forEach(day => {
+                        if (schedule[day - 1].people.length === 0 && person.totalShifts > 0) {
+                            schedule[day - 1].people.push(person.name);
+                            person.totalShifts--;
+                        }
+                    });
+                });
+
+                // Avoid unwanted days
+                people.forEach(person => {
+                    for (let day = 1; day <= daysInMonth; day++) {
+                        if (!person.unwantedDays.includes(day) && person.totalShifts > 0) {
+                            if (schedule[day - 1].people.length === 0) {
+                                schedule[day - 1].people.push(person.name);
+                                person.totalShifts--;
+                            }
+                        }
+                    }
+                });
+
+                // Final adjustments
+                people.forEach(person => {
+                    for (let day = 1; day <= daysInMonth; day++) {
+                        if (person.totalShifts > 0 && schedule[day - 1].people.length === 0) {
+                            schedule[day - 1].people.push(person.name);
+                            person.totalShifts--;
+                        }
+                    }
+                });
+
+                // Render schedule
+                const tbody = document.getElementById('scheduleTable').querySelector('tbody');
+                schedule.forEach(entry => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td>${entry.day}</td><td>${entry.people.join(', ')}</td>`;
+                    tbody.appendChild(row);
+                });
+
+                document.getElementById('progress').classList.add('hidden');
+                document.getElementById('result').classList.remove('hidden');
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

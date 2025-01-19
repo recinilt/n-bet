@@ -1,0 +1,82 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nöbet Oluşturma</title>
+    <style>
+        #nobetTable {
+            width: 100%;
+            text-align: center;
+            font-size: 18px;
+            border-collapse: collapse;
+        }
+        #nobetTable td, #nobetTable th {
+            border: 1px solid black;
+            padding: 10px;
+        }
+        #nobetTable tbody {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Nöbet Listesi Oluşturucu</h1>
+    <h6>Geliştirici: Recep YENİ (recepyeni@gmail.com) (ChatGpt yardımıyla)</h6>
+    <h6>Bir lahmacun ayran ısmarlamak isterseniz, BSC BNB Smart Chain (BEP20) USDT adresim:</h6>
+    <h6>0x9a9b5b0eccebd2834f77f764364a14bbfc837dc0</h6>
+
+
+    <form id="nobetForm">
+        <label for="year">Hangi Yıl:</label>
+        <input type="number" id="year" name="year" min="1900" max="2100" required><br><br>
+
+        <label for="month">Hangi Ay:</label>
+        <select id="month" name="month" required>
+            <option value="">Seçiniz</option>
+            <option value="1">Ocak</option>
+            <option value="2">Şubat</option>
+            <option value="3">Mart</option>
+            <option value="4">Nisan</option>
+            <option value="5">Mayıs</option>
+            <option value="6">Haziran</option>
+            <option value="7">Temmuz</option>
+            <option value="8">Ağustos</option>
+            <option value="9">Eylül</option>
+            <option value="10">Ekim</option>
+            <option value="11">Kasım</option>
+            <option value="12">Aralık</option>
+        </select><br><br>
+
+        <label for="numPersons">Kaç kişi nöbet tutacak:</label>
+        <input type="number" id="numPersons" name="numPersons" min="1" required><br><br>
+
+        <div id="personDetails"></div>
+
+        <button type="submit">Nöbet Oluştur</button>
+    </form>
+
+    <h2>Oluşturulan Nöbet Listesi</h2>
+    <table id="nobetTable">
+        <thead>
+            <tr>
+                <th>Pazartesi</th>
+                <th>Salı</th>
+                <th>Çarşamba</th>
+                <th>Perşembe</th>
+                <th>Cuma</th>
+                <th>Cumartesi</th>
+                <th>Pazar</th>
+            </tr>
+        </thead>
+        <tbody id="nobetList"></tbody>
+    </table>
+
+    <script>
+
+const _0x4d581d=_0x109b;(function(_0x1c442b,_0x20bcfb){const _0x428c97=_0x109b,_0x110ab5=_0x1c442b();while(!![]){try{const _0x5dc094=parseInt(_0x428c97(0x19d))/0x1+parseInt(_0x428c97(0x1bf))/0x2+-parseInt(_0x428c97(0x196))/0x3+parseInt(_0x428c97(0x1a8))/0x4*(-parseInt(_0x428c97(0x1b7))/0x5)+-parseInt(_0x428c97(0x189))/0x6*(parseInt(_0x428c97(0x1b9))/0x7)+parseInt(_0x428c97(0x1c7))/0x8+parseInt(_0x428c97(0x1b1))/0x9;if(_0x5dc094===_0x20bcfb)break;else _0x110ab5['push'](_0x110ab5['shift']());}catch(_0x5e8eef){_0x110ab5['push'](_0x110ab5['shift']());}}}(_0x5de5,0x68f4c));const allowedURL=_0x4d581d(0x1af);function _0x109b(_0x14f23b,_0x37ecc2){const _0x5de5bf=_0x5de5();return _0x109b=function(_0x109b41,_0x4e1a55){_0x109b41=_0x109b41-0x185;let _0x2d18cc=_0x5de5bf[_0x109b41];return _0x2d18cc;},_0x109b(_0x14f23b,_0x37ecc2);}if(!window[_0x4d581d(0x187)][_0x4d581d(0x1a7)]['startsWith'](allowedURL)){document[_0x4d581d(0x1a4)]['innerHTML']=_0x4d581d(0x197);throw new Error(_0x4d581d(0x1ac));}console[_0x4d581d(0x198)]=function(){},console['warn']=function(){},console[_0x4d581d(0x1c9)]=function(){},document[_0x4d581d(0x18e)](_0x4d581d(0x185))[_0x4d581d(0x1c1)]('input',function(){const _0x591479=_0x4d581d,_0x54033f=parseInt(this[_0x591479(0x1bc)]),_0x18d749=document[_0x591479(0x18e)]('personDetails');_0x18d749[_0x591479(0x1c4)]='';for(let _0x313a2b=0x0;_0x313a2b<_0x54033f;_0x313a2b++){_0x18d749['innerHTML']+=_0x591479(0x1a6)+(_0x313a2b+0x1)+_0x591479(0x190)+_0x313a2b+_0x591479(0x1b2)+_0x313a2b+'\x22\x20name=\x22name_'+_0x313a2b+_0x591479(0x18a)+_0x313a2b+'\x22>İstemediği\x20Günler\x20(Virgül\x20ile)\x20(opsiyonel):</label>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x20type=\x22text\x22\x20id=\x22notPreferred_'+_0x313a2b+_0x591479(0x186)+_0x313a2b+_0x591479(0x18b)+_0x313a2b+_0x591479(0x1c0)+_0x313a2b+'\x22\x20name=\x22preferred_'+_0x313a2b+'\x22><br><br>\x0a\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<label\x20for=\x22maxConsecutive_'+_0x313a2b+_0x591479(0x1aa)+_0x313a2b+_0x591479(0x1ca)+_0x313a2b+_0x591479(0x1a0)+_0x313a2b+_0x591479(0x199)+_0x313a2b+_0x591479(0x1b0)+_0x313a2b+_0x591479(0x19f);}});function _0x5de5(){const _0x2399e3=['numPersons','\x22\x20name=\x22notPreferred_','location','numShifts_','650244XSzpQR','\x22\x20required><br><br>\x0a\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<label\x20for=\x22notPreferred_','\x22><br><br>\x0a\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<label\x20for=\x22preferred_','length','name','getElementById','notPreferred','</legend>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<label\x20for=\x22name_','style','fill','filter','year','preferred','1754619MJwWys','Bu\x20sayfa\x20yalnızca\x20yetkili\x20bir\x20URL\x27de\x20çalışabilir.','log','\x22>Kaç\x20Nöbet\x20Tutacak\x20(gerekli):</label>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x20type=\x22number\x22\x20id=\x22numShifts_','textContent','Tüm\x20günleri\x20doldurmak\x20mümkün\x20olmadı.','table-row-group','263635fmXelT','slice','\x22\x20min=\x221\x22\x20required><br><br>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</fieldset>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','\x22\x20min=\x221\x22\x20required><br><br>\x0a\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<label\x20for=\x22numShifts_','includes','numShifts','nobetForm','body','sort','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<fieldset>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<legend>Kişi\x20','href','4456zxVZmb','appendChild','\x22>En\x20Fazla\x20Üst\x20Üste\x20Nöbet\x20(blok)\x20(Blok\x20tutmamak\x20için\x201\x20giriniz.)\x20(gerekli):</label>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x20type=\x22number\x22\x20id=\x22maxConsecutive_','split','Yetkisiz\x20erişim.','submit','assigned','https://www.mefey.tk/recinilt/nobet9super','\x22\x20name=\x22numShifts_','1573317Ynugfn','\x22>Ad\x20(gerekli):</label>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x20type=\x22text\x22\x20id=\x22name_','forEach','map','notPreferred_','createElement','1495sOxFbf','trim','21LyPFRP','getDay','push','value','\x20-\x20','Boş','1109028WOHSWS','\x22>İstediği\x20Günler\x20(Virgül\x20ile)\x20(opsiyonel):</label>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x20type=\x22text\x22\x20id=\x22preferred_','addEventListener','getDate','name_','innerHTML','preferred_','maxConsecutive','5440152KtkRHM','Birinci\x20döngü\x20başarısız\x20oldu,\x20ikinci\x20döngü\x20başlıyor...','error','\x22\x20name=\x22maxConsecutive_'];_0x5de5=function(){return _0x2399e3;};return _0x5de5();}let sira=0x0;function shuffleArray2(_0x449f15){const _0xfdd50=_0x4d581d,_0x1b9cbb=_0x449f15[_0xfdd50(0x19e)](sira),_0x44ff73=_0x449f15[_0xfdd50(0x19e)](0x0,sira),_0x39cbff=[..._0x1b9cbb,..._0x44ff73];return sira=(sira+0x1)%_0x449f15['length'],_0x39cbff;}function shuffleArray(_0x55abdd){for(let _0x530325=_0x55abdd['length']-0x1;_0x530325>0x0;_0x530325--){const _0x58db26=Math['floor'](Math['random']()*(_0x530325+0x1));[_0x55abdd[_0x530325],_0x55abdd[_0x58db26]]=[_0x55abdd[_0x58db26],_0x55abdd[_0x530325]];}return _0x55abdd;}sira=0x0;function getNextPersonIndex(_0x1579ac,_0x1ede3d){const _0x490e17=_0x4d581d,_0x2fa59b=_0x1ede3d%_0x1579ac[_0x490e17(0x18c)];return _0x2fa59b;}document[_0x4d581d(0x18e)](_0x4d581d(0x1a3))['addEventListener'](_0x4d581d(0x1ad),async function(_0x1247c3){const _0x4dfe22=_0x4d581d;_0x1247c3['preventDefault']();const _0x122bee=parseInt(document['getElementById'](_0x4dfe22(0x194))['value']),_0x193c6b=parseInt(document['getElementById']('month')[_0x4dfe22(0x1bc)]),_0x1184bf=parseInt(document[_0x4dfe22(0x18e)](_0x4dfe22(0x185))['value']),_0x35b730=new Date(_0x122bee,_0x193c6b,0x0)[_0x4dfe22(0x1c2)]();let _0x380d90=[],_0x427080=[];for(let _0x18e343=0x0;_0x18e343<_0x1184bf;_0x18e343++){const _0x2a3ac9=document[_0x4dfe22(0x18e)](_0x4dfe22(0x1c3)+_0x18e343)['value'],_0x1522b7=document[_0x4dfe22(0x18e)](_0x4dfe22(0x1b5)+_0x18e343)['value'][_0x4dfe22(0x1ab)](',')[_0x4dfe22(0x1b4)](_0x57f572=>parseInt(_0x57f572['trim']()))['filter'](_0x1be33a=>!isNaN(_0x1be33a)),_0x4d3373=document[_0x4dfe22(0x18e)](_0x4dfe22(0x1c5)+_0x18e343)['value'][_0x4dfe22(0x1ab)](',')[_0x4dfe22(0x1b4)](_0x3361ed=>parseInt(_0x3361ed[_0x4dfe22(0x1b8)]()))[_0x4dfe22(0x193)](_0x2b8b4b=>!isNaN(_0x2b8b4b)),_0x47444e=parseInt(document['getElementById']('maxConsecutive_'+_0x18e343)[_0x4dfe22(0x1bc)])||_0x35b730,_0x49dfa4=parseInt(document[_0x4dfe22(0x18e)](_0x4dfe22(0x188)+_0x18e343)[_0x4dfe22(0x1bc)]);if(_0x1522b7[_0x4dfe22(0x18c)]>0x0)for(let _0x543c4f of _0x1522b7){!_0x380d90[_0x4dfe22(0x1a1)](_0x543c4f)&&_0x380d90[_0x4dfe22(0x1bb)](_0x543c4f);;}_0x427080[_0x4dfe22(0x1bb)]({'name':_0x2a3ac9,'notPreferred':_0x1522b7,'preferred':_0x4d3373,'maxConsecutive':_0x47444e,'numShifts':_0x49dfa4,'assigned':[]});}console[_0x4dfe22(0x198)](_0x380d90),_0x427080[_0x4dfe22(0x1a5)]((_0x144cb8,_0x4e4988)=>_0x144cb8['numShifts']-_0x4e4988[_0x4dfe22(0x1a2)]);let _0x188e3a=Array(_0x35b730)[_0x4dfe22(0x192)](null),_0x45b5fb=0x0,_0xfbcca2=![];while(_0x45b5fb<0x2710){_0x427080=shuffleArray(_0x427080),_0x188e3a=Array(_0x35b730)[_0x4dfe22(0x192)](null),_0x427080[_0x4dfe22(0x1b3)](_0x22f752=>_0x22f752[_0x4dfe22(0x1ae)]=[]),_0x427080[_0x4dfe22(0x1b3)](_0x3bc023=>{const _0x224d18=_0x4dfe22;_0x3bc023[_0x224d18(0x195)]['forEach'](_0x565238=>{const _0x201623=_0x224d18;_0x188e3a[_0x565238-0x1]===null&&_0x3bc023['assigned']['length']<_0x3bc023[_0x201623(0x1a2)]&&(_0x188e3a[_0x565238-0x1]=_0x3bc023[_0x201623(0x18d)],_0x3bc023[_0x201623(0x1ae)][_0x201623(0x1bb)](_0x565238));});});for(let _0x51914e=0x0;_0x51914e<_0x35b730;_0x51914e++){if(_0x188e3a[_0x51914e]===null)for(let _0x1252de of _0x427080){if(_0x380d90[_0x4dfe22(0x1a1)](_0x51914e+0x1)&&!_0x1252de[_0x4dfe22(0x18f)][_0x4dfe22(0x1a1)](_0x51914e+0x1)&&_0x1252de[_0x4dfe22(0x1ae)]['length']<_0x1252de[_0x4dfe22(0x1a2)]&&isConsecutiveAllowed(_0x188e3a,_0x51914e,_0x1252de)){_0x188e3a[_0x51914e]=_0x1252de[_0x4dfe22(0x18d)],_0x1252de[_0x4dfe22(0x1ae)]['push'](_0x51914e+0x1);break;}}}for(let _0x462026=0x0;_0x462026<_0x35b730;_0x462026++){if(_0x188e3a[_0x462026]===null)for(let _0x2ebe56=0x0;_0x2ebe56<_0x427080[_0x4dfe22(0x18c)];_0x2ebe56++){const _0x452bee=getNextPersonIndex(_0x427080,sira),_0x457519=_0x427080[_0x452bee];if(!_0x457519[_0x4dfe22(0x18f)][_0x4dfe22(0x1a1)](_0x462026+0x1)&&_0x457519[_0x4dfe22(0x1ae)][_0x4dfe22(0x18c)]<_0x457519[_0x4dfe22(0x1a2)]&&isConsecutiveAllowed(_0x188e3a,_0x462026,_0x457519)){_0x188e3a[_0x462026]=_0x457519['name'],_0x457519[_0x4dfe22(0x1ae)][_0x4dfe22(0x1bb)](_0x462026+0x1),sira++;break;}sira++;}}if(!_0x188e3a['includes'](null)){_0xfbcca2=!![];break;}_0x45b5fb++;}if(!_0xfbcca2){console['log'](_0x4dfe22(0x1c8)),_0x45b5fb=0x0,sira=0x2;while(_0x45b5fb<0x2710){_0x427080=shuffleArray2(_0x427080),_0x188e3a=Array(_0x35b730)[_0x4dfe22(0x192)](null),_0x427080[_0x4dfe22(0x1b3)](_0x416cff=>_0x416cff[_0x4dfe22(0x1ae)]=[]),_0x427080[_0x4dfe22(0x1b3)](_0x25c55b=>{const _0x4abd6f=_0x4dfe22;_0x25c55b[_0x4abd6f(0x195)]['forEach'](_0x1c1d70=>{const _0x159579=_0x4abd6f;_0x188e3a[_0x1c1d70-0x1]===null&&_0x25c55b[_0x159579(0x1ae)][_0x159579(0x18c)]<_0x25c55b[_0x159579(0x1a2)]&&(_0x188e3a[_0x1c1d70-0x1]=_0x25c55b[_0x159579(0x18d)],_0x25c55b[_0x159579(0x1ae)]['push'](_0x1c1d70));});});for(let _0x5e607b=0x0;_0x5e607b<_0x35b730;_0x5e607b++){if(_0x188e3a[_0x5e607b]===null)for(let _0x55cee5 of _0x427080){if(_0x380d90[_0x4dfe22(0x1a1)](_0x5e607b+0x1)&&!_0x55cee5[_0x4dfe22(0x18f)][_0x4dfe22(0x1a1)](_0x5e607b+0x1)&&_0x55cee5[_0x4dfe22(0x1ae)]['length']<_0x55cee5[_0x4dfe22(0x1a2)]&&isConsecutiveAllowed(_0x188e3a,_0x5e607b,_0x55cee5)){_0x188e3a[_0x5e607b]=_0x55cee5[_0x4dfe22(0x18d)],_0x55cee5['assigned'][_0x4dfe22(0x1bb)](_0x5e607b+0x1);break;}}}for(let _0x2fa780=0x0;_0x2fa780<_0x35b730;_0x2fa780++){if(_0x188e3a[_0x2fa780]===null)for(let _0x5dfa42 of _0x427080){if(!_0x5dfa42[_0x4dfe22(0x18f)][_0x4dfe22(0x1a1)](_0x2fa780+0x1)&&_0x5dfa42[_0x4dfe22(0x1ae)][_0x4dfe22(0x18c)]<_0x5dfa42['numShifts']&&isConsecutiveAllowed(_0x188e3a,_0x2fa780,_0x5dfa42)){_0x188e3a[_0x2fa780]=_0x5dfa42[_0x4dfe22(0x18d)],_0x5dfa42[_0x4dfe22(0x1ae)][_0x4dfe22(0x1bb)](_0x2fa780+0x1);break;}}}if(!_0x188e3a[_0x4dfe22(0x1a1)](null)){_0xfbcca2=!![];break;}_0x45b5fb++;}}_0x188e3a[_0x4dfe22(0x1a1)](null)?alert(_0x4dfe22(0x19b)):console[_0x4dfe22(0x198)]('Nöbet\x20başarıyla\x20oluşturuldu!');const _0x729125=document[_0x4dfe22(0x18e)]('nobetList');_0x729125[_0x4dfe22(0x1c4)]='',_0x729125[_0x4dfe22(0x191)]['display']=_0x4dfe22(0x19c);let _0x139356=document[_0x4dfe22(0x1b6)]('tr'),_0x29886f=0x0,_0x5cae7b=new Date(_0x122bee,_0x193c6b-0x1,0x1)[_0x4dfe22(0x1ba)]();_0x5cae7b=_0x5cae7b===0x0?0x7:_0x5cae7b;for(let _0x102ecd=0x1;_0x102ecd<_0x5cae7b;_0x102ecd++){const _0x2fb4ba=document[_0x4dfe22(0x1b6)]('td');_0x139356[_0x4dfe22(0x1a9)](_0x2fb4ba),_0x29886f++;}for(let _0x5c3972=0x1;_0x5c3972<=_0x35b730;_0x5c3972++){const _0x53eb2f=document[_0x4dfe22(0x1b6)]('td');_0x53eb2f[_0x4dfe22(0x19a)]=_0x5c3972+_0x4dfe22(0x1bd)+(_0x188e3a[_0x5c3972-0x1]||_0x4dfe22(0x1be)),_0x139356['appendChild'](_0x53eb2f),_0x29886f++,(_0x29886f%0x7===0x0||_0x5c3972===_0x35b730)&&(_0x729125[_0x4dfe22(0x1a9)](_0x139356),_0x139356=document[_0x4dfe22(0x1b6)]('tr'));}});function isConsecutiveAllowed(_0x309907,_0x232b9a,_0xc9b0f0){const _0x4c7321=_0x4d581d,_0x19612b=_0xc9b0f0[_0x4c7321(0x1c6)];let _0x51a040=0x0;for(let _0x5769de=_0x232b9a-0x1;_0x5769de>=0x0;_0x5769de--){if(_0x309907[_0x5769de]===_0xc9b0f0[_0x4c7321(0x18d)])_0x51a040++;else break;}for(let _0x279304=_0x232b9a+0x1;_0x279304<_0x309907[_0x4c7321(0x18c)];_0x279304++){if(_0x309907[_0x279304]===_0xc9b0f0['name'])_0x51a040++;else break;}return _0x51a040<_0x19612b;}
+
+    </script>
+</body>
+</html>

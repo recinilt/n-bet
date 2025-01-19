@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nöbet Oluşturma</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .form-section {
+            margin-bottom: 20px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: center;
+        }
+        .progress-bar {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress {
+            width: 0%;
+            height: 20px;
+            background-color: #76c7c0;
+            transition: width 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <h1>Nöbet Oluşturma Sayfası</h1>
+
+    <div class="form-section">
+        <label for="monthYear">Hangi yılın hangi ayı için nöbet oluşturulacak (YYYY-MM):</label>
+        <input type="month" id="monthYear">
+    </div>
+
+    <div class="form-section">
+        <label for="numberOfPeople">Kaç kişi nöbet tutacak:</label>
+        <input type="number" id="numberOfPeople" min="1">
+    </div>
+
+    <div id="peopleDetails"></div>
+
+    <button id="generateDutyButton">Nöbet Oluştur</button>
+
+    <div id="progressContainer" style="display: none;">
+        <div class="progress-bar">
+            <div class="progress" id="progress"></div>
+        </div>
+    </div>
+
+    <table id="scheduleTable" style="display: none;">
+        <thead>
+            <tr>
+                <th>Tarih</th>
+                <th>Nöbetçi</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        const generateDutyButton = document.getElementById('generateDutyButton');
+        const numberOfPeopleInput = document.getElementById('numberOfPeople');
+        const peopleDetailsDiv = document.getElementById('peopleDetails');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progress');
+        const scheduleTable = document.getElementById('scheduleTable');
+        const scheduleTableBody = scheduleTable.querySelector('tbody');
+
+        numberOfPeopleInput.addEventListener('change', () => {
+            const numberOfPeople = parseInt(numberOfPeopleInput.value, 10);
+            peopleDetailsDiv.innerHTML = '';
+
+            for (let i = 0; i < numberOfPeople; i++) {
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <h4>Kişi ${i + 1}</h4>
+                    <label>Adı:</label> <input type="text" class="name"><br>
+                    <label>İstemediği Günler (virgül ile):</label> <input type="text" class="unwantedDays"><br>
+                    <label>İstediği Günler (virgül ile):</label> <input type="text" class="preferredDays"><br>
+                    <label>En fazla kaç gün üst üste nöbet tutabilir:</label> <input type="number" class="maxConsecutive" min="1"><br>
+                    <label>Kaç nöbet tutacak:</label> <input type="number" class="dutyCount" min="1"><br>
+                `;
+                peopleDetailsDiv.appendChild(div);
+            }
+        });
+
+        generateDutyButton.addEventListener('click', () => {
+            const monthYear = document.getElementById('monthYear').value;
+            if (!monthYear) {
+                alert('Lütfen ay ve yıl seçiniz.');
+                return;
+            }
+
+            const daysInMonth = new Date(monthYear.split('-')[0], monthYear.split('-')[1], 0).getDate();
+            const numberOfPeople = parseInt(numberOfPeopleInput.value, 10);
+
+            if (!numberOfPeople || numberOfPeople <= 0) {
+                alert('Lütfen geçerli bir kişi sayısı giriniz.');
+                return;
+            }
+
+            const peopleData = [];
+            const names = document.querySelectorAll('.name');
+            const unwantedDays = document.querySelectorAll('.unwantedDays');
+            const preferredDays = document.querySelectorAll('.preferredDays');
+            const maxConsecutive = document.querySelectorAll('.maxConsecutive');
+            const dutyCount = document.querySelectorAll('.dutyCount');
+
+            for (let i = 0; i < numberOfPeople; i++) {
+                peopleData.push({
+                    name: names[i].value || `Kişi ${i + 1}`,
+                    unwantedDays: (unwantedDays[i].value || '').split(',').map(Number).filter(Boolean),
+                    preferredDays: (preferredDays[i].value || '').split(',').map(Number).filter(Boolean),
+                    maxConsecutive: parseInt(maxConsecutive[i].value, 10) || daysInMonth,
+                    dutyCount: parseInt(dutyCount[i].value, 10) || 1
+                });
+            }
+
+            createSchedule(daysInMonth, peopleData);
+        });
+
+        function createSchedule(daysInMonth, peopleData) {
+            const schedule = Array(daysInMonth).fill(null);
+
+            progressContainer.style.display = 'block';
+            progressBar.style.width = '0%';
+
+            // Fill preferred days first
+            peopleData.forEach(person => {
+                person.preferredDays.forEach(day => {
+                    if (!schedule[day - 1] && person.dutyCount > 0) {
+                        schedule[day - 1] = person.name;
+                        person.dutyCount--;
+                    }
+                });
+            });
+
+            // Mark unwanted days
+            peopleData.forEach(person => {
+                person.unwantedDays.forEach(day => {
+                    if (schedule[day - 1] === null) {
+                        schedule[day - 1] = 'Boş';
+                    }
+                });
+            });
+
+            // Fill remaining duties with max consecutive checks
+            let filled = false;
+            while (!filled) {
+                filled = true;
+                peopleData.forEach(person => {
+                    let consecutiveCount = 0;
+                    for (let day = 0; day < daysInMonth; day++) {
+                        if (!schedule[day] && person.dutyCount > 0) {
+                            const prev = schedule[day - 1] === person.name;
+                            const next = schedule[day + 1] === person.name;
+                            if (prev || next) consecutiveCount++;
+                            else consecutiveCount = 0;
+
+                            if (consecutiveCount < person.maxConsecutive) {
+                                schedule[day] = person.name;
+                                person.dutyCount--;
+                                filled = false;
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Fill remaining duties arbitrarily
+            while (schedule.includes(null)) {
+                peopleData.forEach(person => {
+                    for (let day = 0; day < daysInMonth; day++) {
+                        if (!schedule[day] && person.dutyCount > 0) {
+                            schedule[day] = person.name;
+                            person.dutyCount--;
+                        }
+                    }
+                });
+            }
+
+            renderSchedule(schedule);
+        }
+
+        function renderSchedule(schedule) {
+            scheduleTableBody.innerHTML = '';
+            schedule.forEach((name, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${index + 1}</td><td>${name}</td>`;
+                scheduleTableBody.appendChild(row);
+            });
+            scheduleTable.style.display = 'table';
+            progressContainer.style.display = 'none';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nöbet Oluşturma</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+            text-align: center;
+            padding: 8px;
+        }
+        th, td {
+            font-size: 16px;
+        }
+        .progress {
+            width: 100%;
+            background-color: #f3f3f3;
+            border: 1px solid #ccc;
+            height: 20px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0;
+            background-color: #4caf50;
+        }
+    </style>
+</head>
+<body>
+    <h1>Nöbet Oluşturma</h1>
+    <form id="nobetForm">
+        <label for="year">Yıl:</label>
+        <input type="number" id="year" required><br><br>
+        <label for="month">Ay:</label>
+        <input type="number" id="month" min="1" max="12" required><br><br>
+        <label for="count">Kaç kişi nöbet tutacak:</label>
+        <input type="number" id="count" min="1" required><br><br>
+        <button type="button" id="generateTable">Kişileri Gir</button>
+    </form>
+
+    <div id="personDetails" style="display: none;"></div>
+    <button type="button" id="createSchedule" style="display: none;">Nöbet Listesini Oluştur</button>
+
+    <div id="resultContainer" style="display: none;">
+        <h2>Nöbet Listesi</h2>
+        <table id="nobetListTable">
+            <thead>
+                <tr>
+                    <th>Gün</th>
+                    <th>Nöbetçi</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <script>
+        document.getElementById('generateTable').addEventListener('click', function () {
+            const count = parseInt(document.getElementById('count').value);
+            const personDetails = document.getElementById('personDetails');
+            personDetails.innerHTML = '';
+
+            for (let i = 0; i < count; i++) {
+                personDetails.innerHTML += `
+                    <fieldset>
+                        <legend>Kişi ${i + 1}</legend>
+                        <label>Ad:</label>
+                        <input type="text" id="name_${i}" required><br><br>
+                        <label>İstemediği Günler:</label>
+                        <input type="text" id="notPreferred_${i}"><br><br>
+                        <label>İstediği Günler:</label>
+                        <input type="text" id="preferred_${i}"><br><br>
+                        <label>En Fazla Üst Üste Nöbet:</label>
+                        <input type="number" id="maxConsecutive_${i}" min="1"><br><br>
+                        <label>Toplam Nöbet Sayısı:</label>
+                        <input type="number" id="totalShifts_${i}" min="1" required><br><br>
+                    </fieldset>
+                `;
+            }
+
+            personDetails.style.display = 'block';
+            document.getElementById('createSchedule').style.display = 'block';
+        });
+
+        document.getElementById('createSchedule').addEventListener('click', function () {
+            const year = parseInt(document.getElementById('year').value);
+            const month = parseInt(document.getElementById('month').value);
+            const daysInMonth = new Date(year, month, 0).getDate();
+
+            const people = [];
+            const count = parseInt(document.getElementById('count').value);
+
+            for (let i = 0; i < count; i++) {
+                const name = document.getElementById(`name_${i}`).value;
+                const notPreferred = document.getElementById(`notPreferred_${i}`).value.split(',').map(Number).filter(Boolean);
+                const preferred = document.getElementById(`preferred_${i}`).value.split(',').map(Number).filter(Boolean);
+                const maxConsecutive = parseInt(document.getElementById(`maxConsecutive_${i}`).value) || daysInMonth;
+                const totalShifts = parseInt(document.getElementById(`totalShifts_${i}`).value);
+
+                people.push({ name, notPreferred, preferred, maxConsecutive, totalShifts, assigned: [] });
+            }
+
+            const schedule = Array(daysInMonth).fill(null);
+
+            // Önce istekleri yerleştir
+            people.forEach(person => {
+                person.preferred.forEach(day => {
+                    if (!schedule[day - 1] && person.assigned.length < person.totalShifts) {
+                        schedule[day - 1] = person.name;
+                        person.assigned.push(day);
+                    }
+                });
+            });
+
+            // Boş günlere yerleştir
+            for (let day = 0; day < daysInMonth; day++) {
+                if (!schedule[day]) {
+                    for (let person of people) {
+                        if (
+                            person.assigned.length < person.totalShifts &&
+                            !person.notPreferred.includes(day + 1) &&
+                            isConsecutiveAllowed(schedule, day, person)
+                        ) {
+                            schedule[day] = person.name;
+                            person.assigned.push(day + 1);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // Sonuçları tabloya yaz
+            const tbody = document.querySelector('#nobetListTable tbody');
+            tbody.innerHTML = '';
+            schedule.forEach((person, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${index + 1}</td><td>${person || 'Boş'}</td>`;
+                tbody.appendChild(row);
+            });
+
+            document.getElementById('resultContainer').style.display = 'block';
+        });
+
+        function isConsecutiveAllowed(schedule, day, person) {
+            const maxConsecutive = person.maxConsecutive;
+            let count = 0;
+
+            for (let i = day - 1; i >= 0 && schedule[i] === person.name; i--) count++;
+            for (let i = day + 1; i < schedule.length && schedule[i] === person.name; i++) count++;
+
+            return count < maxConsecutive;
+        }
+    </script>
+</body>
+</html>

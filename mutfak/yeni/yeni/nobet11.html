@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nöbet Oluşturma</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: center;
+        }
+        .progress {
+            width: 100%;
+            background-color: #f3f3f3;
+            border: 1px solid #ccc;
+            margin-top: 20px;
+            position: relative;
+        }
+        .progress-bar {
+            height: 20px;
+            background-color: #4caf50;
+            width: 0%;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <h1>Nöbet Oluşturma Sayfası</h1>
+
+    <form id="inputForm">
+        <label for="year">Hangi yıl için nöbet oluşturulacak? (Zorunlu):</label>
+        <input type="number" id="year" name="year" required><br><br>
+
+        <label for="month">Hangi ay için nöbet oluşturulacak? (Zorunlu):</label>
+        <select id="month" name="month" required>
+            <option value="">Seçiniz</option>
+            <option value="1">Ocak</option>
+            <option value="2">Şubat</option>
+            <option value="3">Mart</option>
+            <option value="4">Nisan</option>
+            <option value="5">Mayıs</option>
+            <option value="6">Haziran</option>
+            <option value="7">Temmuz</option>
+            <option value="8">Ağustos</option>
+            <option value="9">Eylül</option>
+            <option value="10">Ekim</option>
+            <option value="11">Kasım</option>
+            <option value="12">Aralık</option>
+        </select><br><br>
+
+        <label for="numPeople">Kaç kişi nöbet tutacak? (Zorunlu):</label>
+        <input type="number" id="numPeople" name="numPeople" min="1" required><br><br>
+
+        <div id="peopleInputs"></div>
+
+        <button type="button" onclick="generateDutyList()">Nöbet Oluştur</button>
+    </form>
+
+    <div class="progress" id="progressContainer" style="display: none;">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <table id="scheduleTable" style="display: none;">
+        <thead>
+            <tr>
+                <th>Gün</th>
+                <th>Nöbetçi</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        let people = [];
+
+        document.getElementById('numPeople').addEventListener('input', function () {
+            const numPeople = parseInt(this.value);
+            const container = document.getElementById('peopleInputs');
+            container.innerHTML = '';
+
+            for (let i = 1; i <= numPeople; i++) {
+                const personDiv = document.createElement('div');
+                personDiv.innerHTML = `
+                    <h3>Kişi ${i}</h3>
+                    <label>Ad:</label>
+                    <input type="text" id="name_${i}" required><br>
+
+                    <label>İstemediği Günler (opsiyonel, virgül ile):</label>
+                    <input type="text" id="unwantedDays_${i}"><br>
+
+                    <label>İstediği Günler (opsiyonel, virgül ile):</label>
+                    <input type="text" id="wantedDays_${i}"><br>
+
+                    <label>En Fazla Üst Üste Kaç Nöbet Tutabilir (opsiyonel):</label>
+                    <input type="number" id="maxConsecutive_${i}" min="1"><br>
+
+                    <label>Toplam Kaç Nöbet Tutmalı (zorunlu):</label>
+                    <input type="number" id="totalDuties_${i}" min="1" required><br>
+                `;
+                container.appendChild(personDiv);
+            }
+        });
+
+        function generateDutyList() {
+            const year = parseInt(document.getElementById('year').value);
+            const month = parseInt(document.getElementById('month').value);
+            const daysInMonth = new Date(year, month, 0).getDate();
+
+            // Reset table and progress bar
+            document.getElementById('scheduleTable').style.display = 'none';
+            document.getElementById('progressContainer').style.display = 'block';
+            document.getElementById('progressBar').style.width = '0%';
+
+            // Collect people data
+            people = [];
+            const numPeople = parseInt(document.getElementById('numPeople').value);
+            for (let i = 1; i <= numPeople; i++) {
+                people.push({
+                    name: document.getElementById(`name_${i}`).value,
+                    unwantedDays: document.getElementById(`unwantedDays_${i}`).value.split(',').map(Number),
+                    wantedDays: document.getElementById(`wantedDays_${i}`).value.split(',').map(Number),
+                    maxConsecutive: parseInt(document.getElementById(`maxConsecutive_${i}`).value) || Infinity,
+                    totalDuties: parseInt(document.getElementById(`totalDuties_${i}`).value),
+                    assignedDuties: []
+                });
+            }
+
+            const schedule = Array(daysInMonth).fill(null);
+            let iterations = 0;
+
+            while (iterations < 90) {
+                let progress = 0;
+                for (let day = 1; day <= daysInMonth; day++) {
+                    if (!schedule[day - 1]) {
+                        for (let person of people) {
+                            if (person.assignedDuties.length < person.totalDuties &&
+                                !person.unwantedDays.includes(day) &&
+                                (!schedule[day - 2] || schedule[day - 2] !== person.name) &&
+                                (!schedule[day] || schedule[day] !== person.name)) {
+                                schedule[day - 1] = person.name;
+                                person.assignedDuties.push(day);
+                                progress++;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (progress === 0) break; // No progress, stop
+
+                iterations++;
+                document.getElementById('progressBar').style.width = `${(iterations / 90) * 100}%`;
+            }
+
+            const tableBody = document.querySelector('#scheduleTable tbody');
+            tableBody.innerHTML = '';
+            schedule.forEach((person, day) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${day + 1}</td><td>${person || 'Boş'}</td>`;
+                tableBody.appendChild(row);
+            });
+
+            document.getElementById('scheduleTable').style.display = 'table';
+            document.getElementById('progressContainer').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

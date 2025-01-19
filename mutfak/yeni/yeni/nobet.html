@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nöbet Oluşturma</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Nöbet Oluşturma Sayfası</h1>
+
+    <div id="step1" class="form-group">
+        <label for="numPeople">Kaç kişi nöbet tutacak?</label>
+        <input type="number" id="numPeople" min="1" placeholder="Nöbet tutacak kişi sayısını giriniz">
+        <button onclick="createPersonForm()">İleri</button>
+    </div>
+
+    <div id="step2" style="display: none;">
+        <form id="personForm"></form>
+        <button onclick="nextStep()">Devam</button>
+    </div>
+
+    <div id="step3" class="form-group" style="display: none;">
+        <label for="year">Hangi yıl için nöbet oluşturulacak?</label>
+        <input type="number" id="year" min="2023" placeholder="Yılı giriniz">
+
+        <label for="month">Hangi ay için nöbet oluşturulacak?</label>
+        <select id="month">
+            <option value="1">Ocak</option>
+            <option value="2">Şubat</option>
+            <option value="3">Mart</option>
+            <option value="4">Nisan</option>
+            <option value="5">Mayıs</option>
+            <option value="6">Haziran</option>
+            <option value="7">Temmuz</option>
+            <option value="8">Ağustos</option>
+            <option value="9">Eylül</option>
+            <option value="10">Ekim</option>
+            <option value="11">Kasım</option>
+            <option value="12">Aralık</option>
+        </select>
+
+        <button onclick="generateSchedule()">Nöbet Oluştur</button>
+    </div>
+
+    <div id="schedule" style="display: none;">
+        <h2>Oluşturulan Nöbet Programı</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>Gün</th>
+                <th>Nöbetçi(ler)</th>
+            </tr>
+            </thead>
+            <tbody id="scheduleTable">
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function createPersonForm() {
+        const numPeople = document.getElementById('numPeople').value;
+        if (numPeople < 1) {
+            alert('Lütfen geçerli bir sayı giriniz.');
+            return;
+        }
+
+        const form = document.getElementById('personForm');
+        form.innerHTML = '';
+
+        for (let i = 1; i <= numPeople; i++) {
+            form.innerHTML += `
+                <div class="form-group">
+                    <label for="person${i}Name">${i}. Kişinin Adı:</label>
+                    <input type="text" id="person${i}Name" placeholder="Adını giriniz">
+
+                    <label for="person${i}PreferredDays">Hangi günler nöbet istiyor? (Virgülle ayırarak yazınız)</label>
+                    <input type="text" id="person${i}PreferredDays" placeholder="Örnek: Pazartesi, Çarşamba">
+
+                    <label for="person${i}NotPreferredDays">Hangi günler nöbet istemiyor? (Virgülle ayırarak yazınız)</label>
+                    <input type="text" id="person${i}NotPreferredDays" placeholder="Örnek: Cumartesi, Pazar">
+
+                    <label for="person${i}MaxConsecutive">En fazla kaç nöbet üstüste tutabilir?</label>
+                    <input type="number" id="person${i}MaxConsecutive" min="1" placeholder="Sayı giriniz">
+
+                    <label for="person${i}PerShift">Kaçar kaçar nöbet tutmak istiyor?</label>
+                    <input type="number" id="person${i}PerShift" min="1" placeholder="Sayı giriniz">
+                </div>
+            `;
+        }
+
+        document.getElementById('step1').style.display = 'none';
+        document.getElementById('step2').style.display = 'block';
+    }
+
+    function nextStep() {
+        document.getElementById('step2').style.display = 'none';
+        document.getElementById('step3').style.display = 'block';
+    }
+
+    function generateSchedule() {
+        const year = document.getElementById('year').value;
+        const month = document.getElementById('month').value;
+        const daysInMonth = new Date(year, month, 0).getDate();
+        const scheduleTable = document.getElementById('scheduleTable');
+        scheduleTable.innerHTML = '';
+
+        const schedule = [];
+        for (let i = 1; i <= daysInMonth; i++) {
+            schedule.push({ day: i, people: [] });
+        }
+
+        // Mock-up schedule distribution logic
+        // Replace this with the real logic for distributing shifts
+        const numPeople = document.getElementById('numPeople').value;
+        for (let i = 1; i <= numPeople; i++) {
+            const name = document.getElementById(`person${i}Name`).value;
+            schedule[i % daysInMonth].people.push(name);
+        }
+
+        schedule.forEach(entry => {
+            const row = document.createElement('tr');
+            row.innerHTML = `<td>${entry.day}</td><td>${entry.people.join(', ')}</td>`;
+            scheduleTable.appendChild(row);
+        });
+
+        document.getElementById('step3').style.display = 'none';
+        document.getElementById('schedule').style.display = 'block';
+    }
+</script>
+
+</body>
+</html>

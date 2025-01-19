@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nöbet Planlayıcı</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            font-weight: bold;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+        .progress-bar {
+            width: 100%;
+            background-color: #f3f3f3;
+            border: 1px solid #ccc;
+            height: 20px;
+            position: relative;
+            margin-top: 10px;
+        }
+        .progress-bar-fill {
+            background-color: #4caf50;
+            height: 100%;
+            width: 0;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <h1>Nöbet Planlayıcı</h1>
+    <div id="step-1" class="step">
+        <div class="form-group">
+            <label for="numPeople">Kaç kişi nöbet tutacak?</label>
+            <input type="number" id="numPeople" min="1">
+        </div>
+        <button onclick="generatePersonForm()">İlerle</button>
+    </div>
+
+    <div id="step-2" class="step" style="display: none;"></div>
+
+    <div id="step-3" class="step" style="display: none;">
+        <div class="form-group">
+            <label for="year">Hangi yıl?</label>
+            <input type="number" id="year" min="2023">
+        </div>
+        <div class="form-group">
+            <label for="month">Hangi ay?</label>
+            <select id="month">
+                <option value="1">Ocak</option>
+                <option value="2">Şubat</option>
+                <option value="3">Mart</option>
+                <option value="4">Nisan</option>
+                <option value="5">Mayıs</option>
+                <option value="6">Haziran</option>
+                <option value="7">Temmuz</option>
+                <option value="8">Ağustos</option>
+                <option value="9">Eylül</option>
+                <option value="10">Ekim</option>
+                <option value="11">Kasım</option>
+                <option value="12">Aralık</option>
+            </select>
+        </div>
+        <button onclick="generateSchedule()">Nöbet Oluştur</button>
+    </div>
+
+    <div id="progress" class="progress-bar" style="display: none;">
+        <div class="progress-bar-fill" id="progress-bar-fill"></div>
+    </div>
+
+    <div id="schedule" style="display: none;">
+        <h2>Oluşturulan Nöbet Planı</h2>
+        <table id="scheduleTable">
+            <thead>
+                <tr>
+                    <th>Gün</th>
+                    <th>Nöbetçi</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <script>
+        let people = [];
+
+        function generatePersonForm() {
+            const numPeople = document.getElementById("numPeople").value;
+            if (numPeople < 1) return alert("Lütfen geçerli bir kişi sayısı giriniz.");
+
+            let html = "<h2>Kişi Bilgileri</h2>";
+
+            for (let i = 1; i <= numPeople; i++) {
+                html += `
+                    <div class="form-group">
+                        <label>Kişi ${i} Adı:</label>
+                        <input type="text" id="name-${i}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Kaç nöbet tutacak?</label>
+                        <input type="number" id="shifts-${i}" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>İstedikleri günler (virgül ile ayırınız):</label>
+                        <input type="text" id="wantedDays-${i}">
+                    </div>
+                    <div class="form-group">
+                        <label>İstemediği günler (virgül ile ayırınız):</label>
+                        <input type="text" id="unwantedDays-${i}">
+                    </div>
+                    <div class="form-group">
+                        <label>Kaçar kaçar nöbet tutacak?</label>
+                        <input type="number" id="batch-${i}" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>En fazla kaç nöbet üst üste tutabilir?</label>
+                        <input type="number" id="maxConsecutive-${i}" min="1" required>
+                    </div>
+                `;
+            }
+
+            html += '<button onclick="collectPersonData()">İlerle</button>';
+
+            document.getElementById("step-1").style.display = "none";
+            document.getElementById("step-2").innerHTML = html;
+            document.getElementById("step-2").style.display = "block";
+        }
+
+        function collectPersonData() {
+            const numPeople = document.getElementById("numPeople").value;
+            people = [];
+
+            for (let i = 1; i <= numPeople; i++) {
+                people.push({
+                    name: document.getElementById(`name-${i}`).value,
+                    shifts: parseInt(document.getElementById(`shifts-${i}`).value),
+                    wantedDays: document.getElementById(`wantedDays-${i}`).value.split(",").map(d => d.trim()),
+                    unwantedDays: document.getElementById(`unwantedDays-${i}`).value.split(",").map(d => d.trim()),
+                    batch: parseInt(document.getElementById(`batch-${i}`).value),
+                    maxConsecutive: parseInt(document.getElementById(`maxConsecutive-${i}`).value)
+                });
+            }
+
+            document.getElementById("step-2").style.display = "none";
+            document.getElementById("step-3").style.display = "block";
+        }
+
+        function generateSchedule() {
+            const year = document.getElementById("year").value;
+            const month = document.getElementById("month").value;
+            if (!year || !month) return alert("Lütfen yıl ve ay seçiniz.");
+
+            const daysInMonth = new Date(year, month, 0).getDate();
+            const schedule = [];
+
+            document.getElementById("progress").style.display = "block";
+
+            let progress = 0;
+            const progressBarFill = document.getElementById("progress-bar-fill");
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const assigned = people.find(person => 
+                    person.shifts > 0 && 
+                    !person.unwantedDays.includes(day.toString()) &&
+                    (person.wantedDays.length === 0 || person.wantedDays.includes(day.toString()))
+                );
+
+                if (assigned) {
+                    schedule.push({ day, person: assigned.name });
+                    assigned.shifts--;
+                } else {
+                    schedule.push({ day, person: "Boş" });
+                }
+
+                progress = Math.round((day / daysInMonth) * 100);
+                progressBarFill.style.width = `${progress}%`;
+            }
+
+            setTimeout(() => {
+                document.getElementById("progress").style.display = "none";
+                displaySchedule(schedule);
+            }, 500);
+        }
+
+        function displaySchedule(schedule) {
+            const tbody = document.querySelector("#scheduleTable tbody");
+            tbody.innerHTML = "";
+
+            schedule.forEach(entry => {
+                const row = document.createElement("tr");
+                row.innerHTML = `<td>${entry.day}</td><td>${entry.person}</td>`;
+                tbody.appendChild(row);
+            });
+
+            document.getElementById("schedule").style.display = "block";
+        }
+    </script>
+</body>
+</html>
